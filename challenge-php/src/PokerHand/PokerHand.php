@@ -64,7 +64,7 @@ class PokerHand
         return $frequencies;
     }
 
-    public function isTwoPair() {
+    public function getNumPair() {
         $frequencies = $this->countNumFrequency();
         $npair = 0;
         foreach ( $frequencies as $num => $frequency) {
@@ -73,10 +73,7 @@ class PokerHand
             }
         }
 
-        if ( $npair == 2 ) {
-            return true;
-        }
-        return false;
+        return $npair;
     }
 
     public function getRank()
@@ -90,9 +87,14 @@ class PokerHand
             }
         }
 
-        if ( $this->isTwoPair() ) {
+        $npair = $this->getNumPair();
+        if ( $npair == 2 ) {
             return 'Two Pair';
         }
+        elseif ( $npair == 1 ) {
+            return 'One Pair';
+        }
+
         return 'Not a Flush and not two pair';
 
     }
