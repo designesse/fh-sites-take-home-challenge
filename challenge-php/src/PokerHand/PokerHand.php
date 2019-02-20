@@ -49,7 +49,7 @@ class PokerHand
         return false;
     }
 
-    private function countNumFrequency() {
+    private function getNumFrequency() {
         $frequencies[$this->cards[0]['num']] = 1;
         for ( $i=1; $i<count($this->cards); $i++ ) {
             foreach ( $frequencies as $num => $frequency ) {
@@ -61,19 +61,18 @@ class PokerHand
                 }
             }
         }
-        return $frequencies;
-    }
 
-    private function getNumPair() {
-        $frequencies = $this->countNumFrequency();
-        $npair = 0;
-        foreach ( $frequencies as $num => $frequency) {
-            if ( $frequency == 2) {
-                $npair++;
+        $kind4 = 0;
+        $kind3 = 0;
+        $couple = 0;
+        foreach ( $frequencies as $num => $frequency ) {
+            switch ($frequency) {
+                case 4: $kind4++; break;
+                case 3: $kind3++; break;
+                case 2: $couple++; break;
             }
         }
-
-        return $npair;
+        return array('kind4' => $kind4, 'kind3' => $kind3, 'couple' => $couple);
     }
 
     private function isSequential() {
@@ -97,27 +96,46 @@ class PokerHand
 
     public function getRank()
     {
-        if ( $this->isFlush() ) {
+        $isFlush = $this->isFlush();
+        $isSequential = $this->isSequential();
+        if (  $isFlush ) {
             if ( $this->isRoyal() ) {
                 return 'Royal Flush';
             }
-            elseif ( $this->isSequential() ) {
+            elseif ( $isSequential ) {
                 return 'Straight Flush';
-            }
-            else {
-                return 'Flush';
             }
         }
 
-        $npair = $this->getNumPair();
-        if ( $npair == 2 ) {
+        $numOfAKind = $this->getNumFrequency();
+        if ( $numOfAKind['kind4'] == 1 ) {
+            return 'Four of a Kind';
+        }
+
+        if ( $numOfAKind['kind3'] == 1 && $numOfAKind['couple'] == 1 ) {
+            return 'Full House';
+        }
+
+        if ( $isFlush ) {
+            return 'Flush';
+        }
+
+        if ( $isSequential ) {
+            return 'Straight';
+        }
+
+        if ( $numOfAKind['kind3'] == 1 ) {
+            return 'Three of a Kind';
+        }
+
+        if ( $numOfAKind['couple'] == 2 ) {
             return 'Two Pair';
         }
-        elseif ( $npair == 1 ) {
+
+        if ( $numOfAKind['couple'] == 1 ) {
             return 'One Pair';
         }
 
-        return 'Not a Flush and not two pair';
-
+        return 'High Card';
     }
 }
