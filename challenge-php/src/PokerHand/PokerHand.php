@@ -28,7 +28,7 @@ class PokerHand
         }
     }
 
-    public function isFlush() {
+    private function isFlush() {
         $suit = $this->cards[0]['suit'];
         for ( $i=1; $i<count($this->cards); $i++ ) {
             if ( $this->cards[$i]['suit'] != $suit ) {
@@ -38,7 +38,7 @@ class PokerHand
         return true;
     }
 
-    public function isRoyal() {
+    private function isRoyal() {
         $totalNum = 0;
         for ( $i=0; $i<count($this->cards); $i++ ) {
             $totalNum += $this->cards[$i]['num'];
@@ -49,7 +49,7 @@ class PokerHand
         return false;
     }
 
-    public function countNumFrequency() {
+    private function countNumFrequency() {
         $frequencies[$this->cards[0]['num']] = 1;
         for ( $i=1; $i<count($this->cards); $i++ ) {
             foreach ( $frequencies as $num => $frequency ) {
@@ -64,7 +64,7 @@ class PokerHand
         return $frequencies;
     }
 
-    public function getNumPair() {
+    private function getNumPair() {
         $frequencies = $this->countNumFrequency();
         $npair = 0;
         foreach ( $frequencies as $num => $frequency) {
@@ -76,11 +76,33 @@ class PokerHand
         return $npair;
     }
 
+    private function isSequential() {
+        $nums = [];
+        for ( $i=0; $i<count($this->cards); $i++ ) {
+            $nums[] = $this->cards[$i]['num'];
+        }
+        sort($nums);
+
+        if ( $nums[0] == 2 && $nums[count($nums)-1] == 14 ) {
+            array_pop($nums);
+            array_unshift($nums, 1);
+        }
+        for ( $j=0; $j<count($nums)-1; $j++ ) {
+            if ( $nums[$j] != $nums[$j+1]-1 ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public function getRank()
     {
         if ( $this->isFlush() ) {
             if ( $this->isRoyal() ) {
                 return 'Royal Flush';
+            }
+            elseif ( $this->isSequential() ) {
+                return 'Straight Flush';
             }
             else {
                 return 'Flush';
