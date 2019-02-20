@@ -49,6 +49,36 @@ class PokerHand
         return false;
     }
 
+    public function countNumFrequency() {
+        $frequencies[$this->cards[0]['num']] = 1;
+        for ( $i=1; $i<count($this->cards); $i++ ) {
+            foreach ( $frequencies as $num => $frequency ) {
+                if ( $this->cards[$i]['num'] == $num ) {
+                    $frequencies[$num]++;
+                }
+                else {
+                    $frequencies[$this->cards[$i]['num']] = 1;
+                }
+            }
+        }
+        return $frequencies;
+    }
+
+    public function isTwoPair() {
+        $frequencies = $this->countNumFrequency();
+        $npair = 0;
+        foreach ( $frequencies as $num => $frequency) {
+            if ( $frequency == 2) {
+                $npair++;
+            }
+        }
+
+        if ( $npair == 2 ) {
+            return true;
+        }
+        return false;
+    }
+
     public function getRank()
     {
         if ( $this->isFlush() ) {
@@ -59,8 +89,11 @@ class PokerHand
                 return 'Flush';
             }
         }
-        else {
-            return 'Not a Flush';
+
+        if ( $this->isTwoPair() ) {
+            return 'Two Pair';
         }
+        return 'Not a Flush and not two pair';
+
     }
 }
